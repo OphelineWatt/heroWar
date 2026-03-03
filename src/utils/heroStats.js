@@ -9,6 +9,7 @@ export function computeHeroStats(apiHero) {
     id: apiHero.id,
     name: apiHero.name,
     image: apiHero.image.url,
+    
 
     hpMax: 50 + durability * 2,
     attaque: strength + Math.floor(power / 2),

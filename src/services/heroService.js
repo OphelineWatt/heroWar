@@ -19,6 +19,16 @@ export async function fetchHero(id) {
   }
 }
 
+export async function fetchBioById(id) {
+  try {
+    const { data } = await api.get(`/${id}/biography`);
+    return data.response === 'success' ? data : null;
+  } catch (error) {
+    console.error(`Erreur lors du chargement de la bio du héros ${id}:`, error);
+    return null;
+  }
+}
+
 /**
  * Récupère un batch de héros par leurs IDs
  * @param {number} startId - ID du premier héros
@@ -33,7 +43,6 @@ export async function fetchHeroesBatch(startId, endId) {
   }
 
   const results = await Promise.all(promises);
-  // Filtrer les null (héros qui n'existent pas ou erreur)
   return results.filter(hero => hero !== null);
 }
 
@@ -77,7 +86,10 @@ export async function searchHeroes(name) {
 
   try {
     const { data } = await api.get(`/search/${name}`);
-    return data.results || [];
+    
+    if (!data.results) return [];
+
+    return data.results.map(h => computeHeroStats(h));
   } catch (error) {
     console.error('Erreur lors de la recherche:', error);
     return [];

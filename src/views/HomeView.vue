@@ -1,7 +1,11 @@
-<script>
+<script >
 import { ref, onMounted } from 'vue';
 import { fetchHeroesPage, searchHeroes } from '@/services/heroService';
 import HeroCard from '@/components/HeroCard.vue';
+import { useBattleStore } from "@/stores/battleStore";
+import { useRouter } from 'vue-router';
+
+
 
 export default {
   name: 'HomeView',
@@ -9,24 +13,22 @@ export default {
     HeroCard,
   },
   setup() {
-    // Recherche
     const searchName = ref('');
     const searchResults = ref([]);
     const searchLoading = ref(false);
     const searchError = ref(null);
     const hasSearched = ref(false);
-
-    // Pagination (pour l'affichage par défaut)
+    
     const heroes = ref([]);
     const currentPage = ref(1);
     const totalPages = ref(0);
     const hasNext = ref(false);
     const paginationLoading = ref(false);
     const paginationError = ref(null);
-
-    /**
-     * Charge les héros pour la page actuelle
-     */
+    
+    const battleStoreInstance = useBattleStore();
+    const router = useRouter();
+  
     async function loadPage() {
       paginationLoading.value = true;
       paginationError.value = null;
@@ -88,10 +90,15 @@ export default {
       }
     }
 
+    function startFight() {
+      router.push('/battleArena');
+    }
+
     // Charger la première page au montage
     onMounted(() => {
       loadPage();
     });
+    
 
     return {
       // Recherche
@@ -111,16 +118,39 @@ export default {
       paginationError,
       nextPage,
       previousPage,
+
+      // Battle
+      battleStore: battleStoreInstance,
+      startFight,
     };
   },
 };
+
+
 </script>
 
 <template>
   <h1>Bienvenue sur HeroWar</h1>
   <h2>Choisis ton héros et commence à combattre !</h2>
+  <div>
+  <h2>Héros sélectionnés</h2>
 
-  <!-- Barre de recherche -->
+  <div v-if="battleStore.selectedHeroes.length === 0">
+    Aucun héros sélectionné
+  </div>
+
+  <div v-for="hero in battleStore.selectedHeroes" :key="hero.id">
+    <p>{{ hero.name }}</p>
+    <button @click="battleStore.removeHero(hero.id)">Retirer</button>
+  </div>
+
+  <button 
+    v-if="battleStore.canFight"
+    @click="startFight"
+  >
+    Combattre !
+  </button>
+</div>
   <form @submit.prevent="search" class="search-form">
     <input
       v-model="searchName"
@@ -136,26 +166,26 @@ export default {
   <div v-if="hasSearched">
     <div v-if="searchLoading" class="loading">⏳ Recherche en cours...</div>
     <div v-if="searchError" class="error"> {{ searchError }}</div>
-
+    
+    
     <div v-if="searchResults.length > 0" class="heroes-grid">
       <HeroCard
-        v-for="hero in searchResults"
-        :key="hero.id"
-        :hero="hero"
+      v-for="hero in searchResults"
+      :key="hero.id"
+      :hero="hero"
       />
     </div>
     <div v-else-if="!searchLoading" class="no-results">
       Aucun héros trouvé pour "{{ searchName }}"
     </div>
   </div>
-
-  <!-- Affichage par pagination (par défaut) -->
+  
   <div v-else>
 
     <div v-if="paginationLoading" class="loading">
-      ⏳ Chargement de la page {{ currentPage }}...
+      Chargement de la page {{ currentPage }}...
     </div>
-    <div v-if="paginationError" class="error">❌ {{ paginationError }}</div>
+    <div v-if="paginationError" class="error"> {{ paginationError }}</div>
 
     <div v-if="heroes.length > 0" class="heroes-grid">
       <HeroCard v-for="hero in heroes" :key="hero.id" :hero="hero" />
