@@ -4,6 +4,11 @@ import { useStatsStore } from '@/stores/statsStore';
 
 const stats = useStatsStore();
 const leaderboard = computed(() => stats.leaderboard);
+
+function getPublisherClass(publisher) {
+  if (!publisher) return '';
+  return `pub-${publisher.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
+}
 </script>
 
 <template>
@@ -16,10 +21,11 @@ const leaderboard = computed(() => stats.leaderboard);
           <th>Héros</th>
           <th>Victoires</th>
           <th>Défaites</th>
+          <th>Éditeur</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(entry, index) in leaderboard" :key="entry.id">
+        <tr v-for="(entry, index) in leaderboard" :key="entry.id" :class="getPublisherClass(entry.publisher)">
           <td>{{ index + 1 }}</td>
           <td class="champion">
             <img v-if="entry.image" :src="entry.image" :alt="entry.name" />
@@ -27,6 +33,7 @@ const leaderboard = computed(() => stats.leaderboard);
           </td>
           <td>{{ entry.wins }}</td>
           <td>{{ entry.losses }}</td>
+          <td class="publisher">{{ entry.publisher || '-' }}</td>
         </tr>
       </tbody>
     </table>

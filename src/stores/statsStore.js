@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 
 export const useStatsStore = defineStore('stats', {
   state: () => {
-    // try loading from localStorage for persistence
     let initial = {};
     try {
       const stored = localStorage.getItem('heroStats');
@@ -18,7 +17,6 @@ export const useStatsStore = defineStore('stats', {
   },
   getters: {
     leaderboard: (state) => {
-      // return array sorted by wins desc
       return Object.values(state.heroes).sort((a, b) => b.wins - a.wins);
     },
     getStatsById: (state) => {
@@ -39,13 +37,15 @@ export const useStatsStore = defineStore('stats', {
         id: hero.id,
         name: hero.name,
         image: hero.image && hero.image.url ? hero.image.url : hero.image || '',
+        publisher: hero.publisher || '',
         wins: 0,
         losses: 0,
       };
       entry.wins++;
-      // keep name and image up to date
+  
       entry.name = hero.name;
       entry.image = hero.image && hero.image.url ? hero.image.url : hero.image || '';
+      entry.publisher = hero.publisher || '';
       this.heroes[hero.id] = entry;
       this._persist();
     },
@@ -55,12 +55,14 @@ export const useStatsStore = defineStore('stats', {
         id: hero.id,
         name: hero.name,
         image: hero.image && hero.image.url ? hero.image.url : hero.image || '',
+        publisher: hero.publisher || '',
         wins: 0,
         losses: 0,
       };
       entry.losses++;
       entry.name = hero.name;
       entry.image = hero.image && hero.image.url ? hero.image.url : hero.image || '';
+      entry.publisher = hero.publisher || '';
       this.heroes[hero.id] = entry;
       this._persist();
     },

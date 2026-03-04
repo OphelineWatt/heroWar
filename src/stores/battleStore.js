@@ -62,23 +62,21 @@ export const useBattleStore = defineStore("battle", {
 
       defender.hp -= damage;
 
-      // Journal
+      
       this.log.push(
         `${attacker.name} attaque ${defender.name} et inflige ${damage} dégâts. ${defender.name} a ${Math.max(defender.hp, 0)} HP restants.`
       );
 
-      // Vérification de la victoire
       if (defender.hp <= 0) {
         this.winner = attacker.name;
         this.log.push(`Victoire de ${attacker.name} !`);
-        // update stats store
         const stats = useStatsStore();
         stats.recordWin(attacker);
         stats.recordLoss(defender);
         return;
       }
 
-      // Inversion des rôles
+  
       this.currentAttacker = defender;
       this.currentDefender = attacker;
     },

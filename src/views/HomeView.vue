@@ -44,9 +44,7 @@ export default {
       }
     }
 
-    /**
-     * Avance à la page suivante
-     */
+
     function nextPage() {
       if (hasNext.value && !paginationLoading.value) {
         currentPage.value++;
@@ -54,9 +52,7 @@ export default {
       }
     }
 
-    /**
-     * Revient à la page précédente
-     */
+
     function previousPage() {
       if (currentPage.value > 1 && !paginationLoading.value) {
         currentPage.value--;
@@ -64,12 +60,9 @@ export default {
       }
     }
 
-    /**
-     * Recherche un héros par nom (remplace l'affichage par pagination)
-     */
+
     async function search() {
       if (!searchName.value) {
-        // Si on efface la recherche, revenir à la pagination
         hasSearched.value = false;
         searchResults.value = [];
         return;
@@ -94,14 +87,12 @@ export default {
       router.push('/battleArena');
     }
 
-    // Charger la première page au montage
     onMounted(() => {
       loadPage();
     });
     
 
     return {
-      // Recherche
       searchName,
       searchResults,
       searchLoading,
@@ -109,7 +100,7 @@ export default {
       hasSearched,
       search,
 
-      // Pagination
+   
       heroes,
       currentPage,
       totalPages,
@@ -119,7 +110,7 @@ export default {
       nextPage,
       previousPage,
 
-      // Battle
+     
       battleStore: battleStoreInstance,
       startFight,
     };

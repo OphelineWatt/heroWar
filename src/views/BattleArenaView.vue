@@ -15,6 +15,7 @@ battle.startBattle();
     <div class="heroes">
       <div class="hero">
         <h2>{{ battle.heroA.name }}</h2>
+        <p class="publisher" v-if="battle.heroA.publisher">{{ battle.heroA.publisher }}</p>
         <img v-if="battle.heroA.image" :src="battle.heroA.image.url || battle.heroA.image" :alt="battle.heroA.name" />
         <div class="hp-bar">
           <div
@@ -27,6 +28,7 @@ battle.startBattle();
 
       <div class="hero">
         <h2>{{ battle.heroB.name }}</h2>
+        <p class="publisher" v-if="battle.heroB.publisher">{{ battle.heroB.publisher }}</p>
         <img v-if="battle.heroB.image" :src="battle.heroB.image.url || battle.heroB.image" :alt="battle.heroB.name" />
         <div class="hp-bar">
           <div

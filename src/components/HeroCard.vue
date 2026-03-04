@@ -12,10 +12,15 @@ function selectHero() {
   if (!props.hero) return;
   battleStoreInstance.addHero(props.hero);
 }
+
+function getPublisherClass(publisher) {
+  if (!publisher) return '';
+  return `pub-${publisher.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
+}
 </script>
 
 <template>
-  <div class="hero-card">
+  <div class="hero-card" :class="getPublisherClass(props.hero.publisher)">
     <h3>{{ props.hero.name }}</h3>
 
     <img
@@ -33,6 +38,10 @@ function selectHero() {
       <p><strong>Attaque :</strong> {{ props.hero.attaque }}</p>
       <p><strong>Défense :</strong> {{ props.hero.defense }}</p>
       <p><strong>Vitesse :</strong> {{ props.hero.vitesse }}</p>
+    </div>
+
+    <div class="publisher" v-if="props.hero.publisher">
+      <strong>Éditeur :</strong> {{ props.hero.publisher }}
     </div>
   </div>
 </template>

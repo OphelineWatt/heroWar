@@ -60,3 +60,51 @@ npm run dev
 ```sh
 npm run build
 ```
+
+## Règles du Combat
+
+### Déroulement du combat
+
+1. **Sélection des héros** : Choisissez 2 héros depuis la page d'accueil pour les ajouter à votre équipe de combat
+2. **Initiativé** : Le héros avec la vitesse la plus élevée attaque en premier chaque tour
+3. **Attaque** : L'attaquant inflige `attaque - défense_adversaire` dégâts à l'adversaire
+4. **Dégâts minimum** : 1 point de dégâts minimum est toujours infligé
+5. **Fin du combat** : Le combat s'arrête quand un héros est réduit à 0 HP
+6. **Victoire** : L'héros avec encore des HP remporte la victoire et gagne un point au classement
+7. **Stats sauvegardées** : Les victoires et défaites sont enregistrées localement et affichées au classement
+
+## Calcul des Stats
+
+Les stats des héros sont calculées à partir des power stats de l'API Superhero :
+
+**HP Max (Points de Vie)**  
+```
+hpMax = 50 + durability × 2
+```
+
+**Attaque**  
+```
+attaque = strength + floor(power ÷ 2)
+```
+
+**Défense**  
+```
+defense = floor((durability + combat) ÷ 2)
+```
+
+**Vitesse**  
+```
+vitesse = speed
+```
+
+### Exemple de calcul
+
+Pour Batman (durability: 56, strength: 88, power: 61, combat: 78, speed: 55) :
+- **HP Max** : 50 + 56 × 2 = 162 HP
+- **Attaque** : 88 + floor(61 ÷ 2) = 88 + 30 = 118
+- **Défense** : floor((56 + 78) ÷ 2) = floor(134 ÷ 2) = 67
+- **Vitesse** : 55
+
+
+
+

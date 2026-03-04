@@ -4,17 +4,30 @@ import { computeHeroStats } from "../utils/heroStats";
 const MAX_ID = 731;
 const PAGE_SIZE = 20;
 
-/**
- * Récupère un héros par son ID
- * @param {number} id - ID du héros
- * @returns {Promise<Object|null>} Les données du héros ou null en cas d'erreur
- */
 export async function fetchHero(id) {
   try {
     const { data } = await api.get(`/${id}`);
     return data.response === 'success' ? data : null;
   } catch (error) {
     console.error(`Erreur lors du chargement du héros ${id}:`, error);
+    return null;
+  }
+}
+
+export async function fetchHeroWithBio(id) {
+  try {
+    const heroData = await fetchHero(id);
+    if (!heroData) return null;
+
+    const bioData = await fetchBioById(id);
+    if (bioData) {
+      const publisher = bioData.publisher || (bioData.biography && bioData.biography.publisher) || '';
+      heroData.publisher = publisher;
+    }
+
+    return heroData;
+  } catch (error) {
+    console.error(`Erreur lors du chargement complet du héros ${id}:`, error);
     return null;
   }
 }
@@ -29,28 +42,22 @@ export async function fetchBioById(id) {
   }
 }
 
-/**
- * Récupère un batch de héros par leurs IDs
- * @param {number} startId - ID du premier héros
- * @param {number} endId - ID du dernier héros (inclus)
- * @returns {Promise<Array>} Tableau des héros trouvés
- */
+
+
+
+ 
 export async function fetchHeroesBatch(startId, endId) {
   const promises = [];
 
   for (let id = startId; id <= endId; id++) {
-    promises.push(fetchHero(id));
+    promises.push(fetchHeroWithBio(id));
   }
 
   const results = await Promise.all(promises);
   return results.filter(hero => hero !== null);
 }
 
-/**
- * Récupère les héros pour une page donnée
- * @param {number} page - Numéro de page (commence à 1)
- * @returns {Promise<Object>} { heroes, hasNext, page, totalPages }
- */
+
 export async function fetchHeroesPage(page = 1) {
   const startId = (page - 1) * PAGE_SIZE + 1;
   const endId = Math.min(page * PAGE_SIZE, MAX_ID);
@@ -74,11 +81,7 @@ export async function fetchHeroesPage(page = 1) {
   };
 }
 
-/**
- * Recherche un héros par nom
- * @param {string} name - Nom du héros
- * @returns {Promise<Array>} Tableau des héros trouvés
- */
+
 export async function searchHeroes(name) {
   if (!name || name.trim() === '') {
     return [];
@@ -89,7 +92,17 @@ export async function searchHeroes(name) {
     
     if (!data.results) return [];
 
-    return data.results.map(h => computeHeroStats(h));
+    const promises = data.results.map(async (h) => {
+      const bioData = await fetchBioById(h.id);
+      if (bioData) {
+        const publisher = bioData.publisher || (bioData.biography && bioData.biography.publisher) || '';
+        h.publisher = publisher;
+      }
+      return computeHeroStats(h);
+    });
+
+    const results = await Promise.all(promises);
+    return results;
   } catch (error) {
     console.error('Erreur lors de la recherche:', error);
     return [];
